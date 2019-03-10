@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "tiny-led-matrix"
+version = "0.1.0"
+authors = ["Matthew Woodcraft <matthew@woodcraft.me.uk>"]
+description = "A library for direct control of a small monochrome LED display."
+readme = "README.md"
+keywords = ["microbit"]
+categories = ["embedded", "hardware-support", "no-std"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/mattheww/microbit-blinkenlights/"
+
+[dependencies]
