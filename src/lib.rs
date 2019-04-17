@@ -156,7 +156,7 @@ mod timer;
 mod render;
 
 pub use control::DisplayControl;
-pub use display::{RowPlan, Matrix, Frame, Display,
+pub use display::{RowPlan, Matrix, Frame, Display, Event,
                   initialise_timer, initialise_control,
 };
 pub use timer::DisplayTimer;

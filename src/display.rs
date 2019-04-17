@@ -247,6 +247,33 @@ const GREYSCALE_TIMINGS: [u16; BRIGHTNESSES-2] = [
 //     0,  //   9,    375,   6000µs,   188%
 ];
 
+
+/// The reason for a display-timer interrupt.
+///
+/// This is the return value from [`handle_event()`].
+///
+/// [`handle_event()`]: Display::handle_event
+#[derive(PartialEq, Eq, Debug)]
+pub enum Event {
+    /// The display has switched to lighting a new row.
+    SwitchedRow,
+    /// The display has changed the LEDs in the current row.
+    UpdatedRow,
+    /// Neither a new primary cycle nor a secondary alarm has occurred.
+    Unknown,
+}
+
+impl Event {
+    /// Checks whether this event is `SwitchedRow`.
+    ///
+    /// This is provided for convenience in the common case where you want to
+    /// perform some action based on the display timer's primary cycle.
+    pub fn is_new_row(self) -> bool {
+        self == Event::SwitchedRow
+    }
+}
+
+
 /// Starts the timer you plan to use with a [`Display`].
 ///
 /// Call this once before using a [`Display`].
@@ -438,6 +465,9 @@ impl<F: Frame> Display<F> {
     /// [`enable_secondary()`][DisplayTimer::enable_secondary], and/or
     /// [`disable_secondary()`][DisplayTimer::disable_secondary] methods.
     ///
+    /// Returns a value indicating the reason for the interrupt. You can check
+    /// this if you wish to perform some other action once per primary cycle.
+    ///
     /// # Example
     ///
     /// In the style of `cortex-m-rtfm` v0.4:
@@ -445,23 +475,29 @@ impl<F: Frame> Display<F> {
     /// ```ignore
     /// #[interrupt(priority = 2, resources = [TIMER1, GPIO, DISPLAY])]
     /// fn TIMER1() {
-    ///     resources.DISPLAY.handle_event(
+    ///     let display_event = resources.DISPLAY.handle_event(
     ///         &mut MyDisplayControl(&mut resources.TIMER1),
     ///         &mut MyDisplayControl(&mut resources.GPIO),
     ///     );
+    ///     if display_event.is_new_row() {
+    ///         ...
+    ///     }
     /// }
     /// ```
     pub fn handle_event(&mut self,
                         timer: &mut impl DisplayTimer,
-                        control: &mut impl DisplayControl) {
+                        control: &mut impl DisplayControl) -> Event {
         let row_timer_fired = timer.check_primary();
         let brightness_timer_fired = timer.check_secondary();
         if row_timer_fired {
             self.render_row(control, timer);
+            Event::SwitchedRow
         } else if brightness_timer_fired {
             self.render_subrow(control, timer);
+            Event::UpdatedRow
+        } else {
+            Event::Unknown
         }
-
     }
 
 }
