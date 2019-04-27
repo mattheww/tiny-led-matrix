@@ -1,3 +1,5 @@
+## tiny-led-matrix 1.0.0 (2019-04-27)
+
 * Make `Display::handle_event()`` return a value indicating whether a new
   primary cycle has begun.
 

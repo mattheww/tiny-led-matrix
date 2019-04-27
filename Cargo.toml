@@ -1,7 +1,7 @@
 [package]
 edition = "2018"
 name = "tiny-led-matrix"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Matthew Woodcraft <matthew@woodcraft.me.uk>"]
 description = "A library for direct control of a small monochrome LED display."
 readme = "README.md"
