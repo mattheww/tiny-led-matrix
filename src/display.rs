@@ -310,23 +310,26 @@ pub fn initialise_control(control: &mut impl DisplayControl) {
 ///
 /// # Example
 ///
-/// Using `cortex-m-rtfm` v0.4.1:
+/// Using `cortex-m-rtfm` v0.5:
 /// ```ignore
-/// #[app(device = nrf51)]
+/// #[app(device = nrf51, peripherals = true)]
 /// const APP: () = {
-///     static mut GPIO: nrf51::GPIO = ();
-///     static mut TIMER1: nrf51::TIMER1 = ();
-///     static mut DISPLAY: Display<MyFrame> = ();
+///
+///     struct Resources {
+///         gpio: nrf51::GPIO,
+///         timer1: nrf51::TIMER1,
+///         display: Display<MyFrame>,
+///     }
 ///
 ///     #[init]
-///     fn init() -> init::LateResources {
-///         let mut p: nrf51::Peripherals = device;
+///     fn init(cx: init::Context) -> init::LateResources {
+///         let mut p: nrf51::Peripherals = cx.device;
 ///         display::initialise_control(&mut MyDisplayControl(&mut p.GPIO));
 ///         display::initialise_timer(&mut MyDisplayTimer(&mut p.TIMER1));
 ///         init::LateResources {
-///             GPIO : p.GPIO,
-///             TIMER1 : p.TIMER1,
-///             DISPLAY : Display::new(),
+///             gpio : p.GPIO,
+///             timer1 : p.TIMER1,
+///             display : Display::new(),
 ///         }
 ///     }
 /// }
@@ -363,16 +366,15 @@ impl<F: Frame> Display<F> {
     ///
     /// # Example
     ///
-    /// In the style of `cortex-m-rtfm` v0.4:
+    /// In the style of `cortex-m-rtfm` v0.5:
     ///
     /// ```ignore
-    /// #[interrupt(priority = 1, resources = [RTC0, DISPLAY])]
-    /// fn RTC0() {
+    /// #[task(binds = RTC0, priority = 1, resources = [rtc0, display])]
+    /// fn rtc0(mut cx: rtc0::Context) {
     ///     static mut FRAME: MyFrame = MyFrame::const_default();
-    ///     let event_reg = &resources.RTC0.events_tick;
-    ///     event_reg.write(|w| unsafe {w.bits(0)} );
+    ///     &cx.resources.rtc0.clear_tick_event();
     ///     FRAME.set(GreyscaleImage::blank());
-    ///     resources.DISPLAY.lock(|display| {
+    ///     cx.resources.display.lock(|display| {
     ///         display.set_frame(FRAME);
     ///     });
     /// }
@@ -470,14 +472,15 @@ impl<F: Frame> Display<F> {
     ///
     /// # Example
     ///
-    /// In the style of `cortex-m-rtfm` v0.4:
+    /// In the style of `cortex-m-rtfm` v0.5:
     ///
     /// ```ignore
-    /// #[interrupt(priority = 2, resources = [TIMER1, GPIO, DISPLAY])]
-    /// fn TIMER1() {
-    ///     let display_event = resources.DISPLAY.handle_event(
-    ///         &mut MyDisplayControl(&mut resources.TIMER1),
-    ///         &mut MyDisplayControl(&mut resources.GPIO),
+    /// #[task(binds = TIMER1, priority = 2,
+    ///        resources = [timer1, gpio, display])]
+    /// fn timer1(cx: timer1::Context) {
+    ///     let display_event = cx.resources.display.handle_event(
+    ///         &mut MyDisplayControl(&mut cx.resources.timer1),
+    ///         &mut MyDisplayControl(&mut cx.resources.gpio),
     ///     );
     ///     if display_event.is_new_row() {
     ///         ...

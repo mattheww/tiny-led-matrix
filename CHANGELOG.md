@@ -1,3 +1,6 @@
+* Update examples in docs to use cortex-m-rtfm v0.5
+
+
 ## tiny-led-matrix 1.0.0 (2019-04-27)
 
 * Make `Display::handle_event()`` return a value indicating whether a new
