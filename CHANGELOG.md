@@ -1,3 +1,5 @@
+## tiny-led-matrix 1.0.1 (2019-11-16)
+
 * Update examples in docs to use cortex-m-rtfm v0.5
 
 
