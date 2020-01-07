@@ -1,3 +1,5 @@
+## tiny-led-matrix 1.0.2 (2020-01-07)
+
 * Fix repository URL in Cargo.toml
 
 
