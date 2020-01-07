@@ -8,6 +8,6 @@ readme = "README.md"
 keywords = ["microbit"]
 categories = ["embedded", "hardware-support", "no-std"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/mattheww/microbit-blinkenlights/"
+repository = "https://github.com/mattheww/tiny-led-matrix"
 
 [dependencies]
